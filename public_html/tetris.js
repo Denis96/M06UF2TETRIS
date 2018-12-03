@@ -1,3 +1,23 @@
+/*
+	I = cyan
+	J = blue
+	L = orange
+	O = yellow
+	S = green
+	T = purple
+	Z = red
+*/
+var game = { 
+	board: null,
+	nextPiece: null,
+	points: null,
+	countPieces: {"i" : null,"j" : null,"l" : null,"o" : null}, // I, J, L, O, S, T, Z
+	//countPieces: [null, null, null, null, null, null, null], // I, J, L, O, S, T, Z
+	dades: function() // metodes : funció,
+	{ return(this.nom + "-" + this.ocupacio + "-" + this.edat);
+	}
+}; 
+ 
 // 0 1 y
 // 1 
 // x
@@ -38,7 +58,7 @@ var pieza = function(color, forma, posX, posY)
 				out = out+"<br>";
 				for (var j = 0; j < this.forma[i].length; j++) {
 					if (this.forma[i][j]==1) {
-						out = out+"<span style=\"color:DeepPink\">&#9724;</span>";
+						out = out+"<span style=\"color:"+this.color+"\">&#9724;</span>";
 
 					} else {
 						out = out+"&#9724;";
@@ -56,7 +76,7 @@ var  forma = [
 	[0, 1, 1, 0],
 	[0, 0, 0, 0],
 ];
-var piezaej = new pieza('azul', forma, '5', '5'); 
+var piezaej = new pieza('blue', forma, '5', '5'); 
 
 function myFunctionMostar() {
 	piezaej.mostrar();
