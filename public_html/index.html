@@ -5,16 +5,58 @@
 		<title>Denis Pereira - M06UF2</title>
 		<script type="text/javascript" src="tetris.js"></script>
 		<noscript>El navegador no soporta JavaScript!</noscript> <!--Missatge que surt si el navegador no executa JS-->
+		<style>
+			/*	I = cyan
+				J = blue
+				L = orange
+				O = yellow
+				S = green
+				T = purple
+				Z = red*/
+			.i {
+				color: cyan;
+			}
+			.j {
+				color: blue;
+			}
+			.l {
+				color: orange;
+			}
+			.o {
+				color: yellow;
+			}
+			.s {
+				color: lime;
+			}
+			.t {
+				color: MediumOrchid;
+			}
+			.z {
+				color: red;
+			}
+			
+		</style>
 	</head>
 	<body>
 		<p>Aquest és el cos de la meva pàgina</p>
 		<hr/>
-		<button onclick="myFunctionMostar()">mostrar</button>
-		<button onclick="myFunctionGirar()">girar</button>
-		<button onclick="myFunctionBajar()">bajar</button>
-		<button onclick="myFunctionMoverI()">girar</button>
-		<button onclick="myFunctionMoverD()">girar</button>
-			<button onclick="window.location.href='..'">alt+&larr;</button>
+		
+		<div class="bottons">
+			<button onclick="myFunctionMostrar()">mostrar</button>
+			<button onclick="myFunctionGirar()">girar</button>
+			<button onclick="myFunctionBajar()">bajar</button>
+			<button onclick="myFunctionMoverI()">&larr;</button>
+			<button onclick="myFunctionMoverD()">&rarr;</button>
+			<button onclick="myFunctionNewPiece()">nueva pieza</button>
+		</div>
+			
+		<hr/>
+		
+		<p style="font-family:Courier;line-height:1;" id="game"></p>
+		
+		<hr/>
+		
 		<p style="font-family:Courier;line-height:1;" id="resultado"></p>
+		
 	</body>
 </html>
