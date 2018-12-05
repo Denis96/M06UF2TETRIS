@@ -116,7 +116,7 @@ var piece = function(name, form, posX, posY)
 					name = "s";
 					forma = [[0, 0, 0, 0],[0, 1, 1, 0],[1, 1, 0, 0],[0, 0, 0, 0]];
 					break;
-				default: alert("error genera nombre de pessa");
+				default: alert("Error in new piece");
 			}	
 			return new piece(name, forma, 0, 6);
 		};
