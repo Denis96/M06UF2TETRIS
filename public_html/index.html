@@ -6,34 +6,15 @@
 		<script type="text/javascript" src="tetris.js"></script>
 		<noscript>El navegador no soporta JavaScript!</noscript> <!--Missatge que surt si el navegador no executa JS-->
 		<style>
-			/*	I = cyan
-				J = blue
-				L = orange
-				O = yellow
-				S = green
-				T = purple
-				Z = red*/
-			.i {
-				color: cyan;
-			}
-			.j {
-				color: blue;
-			}
-			.l {
-				color: orange;
-			}
-			.o {
-				color: yellow;
-			}
-			.s {
-				color: lime;
-			}
-			.t {
-				color: MediumOrchid;
-			}
-			.z {
-				color: red;
-			}
+			.i {	color: cyan;	}
+			.j {	color: blue;	}
+			.l {	color: orange;	}
+			.o {	color: yellow;	}
+			.s {	color: lime;	}
+			.t {	color: MediumOrchid;}
+			.z {	color: red;		}
+			.w {	color: black;	} /* wall */
+			.e {	color: LightGray;	} /* empty */
 			
 		</style>
 	</head>
@@ -42,12 +23,15 @@
 		<hr/>
 		
 		<div class="bottons">
-			<button onclick="myFunctionMostrar()">mostrar</button>
-			<button onclick="myFunctionGirar()">girar</button>
-			<button onclick="myFunctionBajar()">bajar</button>
-			<button onclick="myFunctionMoverI()">&larr;</button>
-			<button onclick="myFunctionMoverD()">&rarr;</button>
-			<button onclick="myFunctionNewPiece()">nueva pieza</button>
+			<button onclick="PlayGame()">mostrar</button>
+			<button onclick="log()">log game</button>
+			<br><br>
+			<button onclick="myFunctionGirarP()">girar</button>
+			<button onclick="myFunctionBajarP()">bajar</button>
+			<button onclick="myFunctionMoverIP()">&larr;</button>
+			<button onclick="myFunctionMoverDP()">&rarr;</button>
+			<button onclick="myFunctionNewPieceP()">nueva pieza</button>
+			
 		</div>
 			
 		<hr/>
@@ -56,7 +40,8 @@
 		
 		<hr/>
 		
-		<p style="font-family:Courier;line-height:1;" id="resultado"></p>
+		<p style="font-family:Courier;line-height:1;" id="logPiece"></p>
+		<p style="font-family:Courier;line-height:1;" id="logGame"></p>
 		
 	</body>
 </html>
