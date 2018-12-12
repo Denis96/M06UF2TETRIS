@@ -1,3 +1,14 @@
+//	0 1 2 3 4 5 6 7
+//
+//	0  1 O O O O O O 1	I = 4
+//	1  1 O · O O · O 1	J = 2
+//	2  1 O # # O O O 1
+//	3  X O O # # O O 1	pos[0] = 4 -> 3
+//	4  1 O X O O · O 1	pos[1] = 2 -> 0
+//	5  1 O O O O O O 1
+//	6  1 O O O O O O 1	fomra 4 x 4
+//	7  1 O O O O O O 1
+
 var game = { 
 	board: null,	//	IMPORTANTE! ARRAY CON LETRAS E(MPTY), W(ALL) Y LAS OTRAS PARA LAS PEIZAS
 	lengthB: [22, 12],
@@ -33,52 +44,62 @@ var game = {
 		var out = "";
 		for (var i=0 ; i < this.board.length ; i++) {
 			for (var j=0 ; j < this.board[i].length ; j++) {
-				out+="<span class=\""+ this.board[i][j] +"\">&#9724</span>";
+				//if (0 <= activePiece.pos[0]-activePiece.form.legth) 
+				//if (i<activePiece.form.length &&
+						//j<activePiece.form[0].length) {
+					if (activePiece.form[i+activePiece.form.length][j]==1) {
+					//if (activePiece.pos[0]==i && activePiece.pos[1]==j) {
+						out+="<span class=\""+ activePiece.name +"\">&#9724</span>";
+//					} else {
+//						out+="<span class=\""+ this.board[i][j] +"\">&#9724</span>";
+//					}
+				} else {
+					out+="<span class=\""+ this.board[i][j] +"\">&#9724</span>";
+				}
 			}
-			out+="<br>"
+			out+="<br>";
 		}
 		document.getElementById("game").innerHTML = out;
-	},/*
-	showCountP: function(out, element, index, array) {
-		out+="<br>Count - "+ $p +": "+np;
-		return out
-	},*/
+	},
 	newRandomPiece: function() {
-			var i = parseInt(Math.random() * 7);
-			var name = null;
-			var forma = null;
-			switch (i) {
-				case 0:
-					name = "i";
-					forma = [[0, 1, 0, 0],[0, 1, 0, 0],[0, 1, 0, 0],[0, 1, 0, 0]];
-					break;
-				case 1:
-					name = "j";
-					forma = [[0, 0, 1, 0],[0, 0, 1, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
-					break;
-				case 2:
-					name = "l";
-					forma = [[0, 1, 0, 0],[0, 1, 0, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
-					break;
-				case 3:
-					name = "o";
-					forma = [[0, 0, 0, 0],[0, 1, 1, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
-					break;
-				case 4:
-					name = "z";
-					forma = [[0, 0, 0, 0],[1, 1, 0, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
-					break;
-				case 5:
-					name = "t";
-					forma = [[0, 0, 0, 0],[1, 1, 1, 0],[0, 1, 0, 0],[0, 0, 0, 0]];
-					break;
-				case 6:
-					name = "s";
-					forma = [[0, 0, 0, 0],[0, 1, 1, 0],[1, 1, 0, 0],[0, 0, 0, 0]];
-					break;
-				default: alert("Error in new piece");
-			}
-			return new piece(name, forma, 0, 4);
+		var i = parseInt(Math.random() * 7);
+		var name = null;
+		var forma = null;
+		switch (i) {
+			case 0:
+				name = "i";
+				forma = [[0, 1, 0, 0],[0, 1, 0, 0],[0, 1, 0, 0],[0, 1, 0, 0]];
+				break;
+			case 1:
+				name = "j";
+				forma = [[0, 0, 1, 0],[0, 0, 1, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
+				break;
+			case 2:
+				name = "l";
+				forma = [[0, 1, 0, 0],[0, 1, 0, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
+				break;
+			case 3:
+				name = "o";
+				forma = [[0, 0, 0, 0],[0, 1, 1, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
+				break;
+			case 4:
+				name = "z";
+				forma = [[0, 0, 0, 0],[1, 1, 0, 0],[0, 1, 1, 0],[0, 0, 0, 0]];
+				break;
+			case 5:
+				name = "t";
+				forma = [[0, 0, 0, 0],[1, 1, 1, 0],[0, 1, 0, 0],[0, 0, 0, 0]];
+				break;
+			case 6:
+				name = "s";
+				forma = [[0, 0, 0, 0],[0, 1, 1, 0],[1, 1, 0, 0],[0, 0, 0, 0]];
+				break;
+			default: alert("Error in new piece");
+		}
+		return new piece(name, forma, 3, 4);
+	},
+	move: function() {
+		
 	},
 	playGame: function() {
 		endGame(); // Evita que pueda haber multibles setIntervals activos
@@ -135,6 +156,7 @@ var piece = function(name, form, posX, posY)
 		this.newPiece = function() {
 			var tempPiece = game.nextPiece;
 			game.nextPiece = game.newRandomPiece();
+			game.countP[tempPiece.name] += 1;
 			return tempPiece;
 		};
 		this.log = function() {
@@ -165,41 +187,44 @@ var piece = function(name, form, posX, posY)
 			return parseInt(Math.random() * 7);
 		};*/
 };
-var  forma = [
-	[0, 1, 0, 0],
-	[0, 1, 0, 0],
-	[0, 1, 1, 0],
-	[0, 0, 0, 0],
-];
-var piezaej = new piece('i', forma, '5', '5'); 
-piezaej = game.newRandomPiece();
+var activePiece = null;
+function initGame() {
+	game.init();
+	activePiece = game.newRandomPiece();
+	game.countP[activePiece.name] += 1;
+}
 
-game.init();
 
 function PlayGame() {
+	initGame();
 	game.show();
+}
+function RestartGame() {
+	initGame();
+	game.show();
+	log();
 }
 function log() {
 	game.log();
-	piezaej.printLog();
+	activePiece.printLog();
 }
 function myFunctionGirarP() {
-	piezaej.turn();
+	activePiece.turn();
 	log();
 }
 function myFunctionBajarP() {
-	piezaej.godown();
+	activePiece.godown();
 	log();
 }
 function myFunctionMoverIP() {
-	piezaej.move(-1);
+	activePiece.move(-1);
 	log();
 }
 function myFunctionMoverDP() {
-	piezaej.move(1);
+	activePiece.move(1);
 	log();
 }
 function myFunctionNewPieceP() {
-	piezaej = piezaej.newPiece();
+	activePiece = activePiece.newPiece();
 	log();
 }
