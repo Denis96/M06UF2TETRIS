@@ -13,6 +13,7 @@ var game = {
 	board: null,	//	IMPORTANTE! ARRAY CON LETRAS E(MPTY), W(ALL) Y LAS OTRAS PARA LAS PEIZAS
 	lengthB: [22, 12],
 	nextPiece: null,
+	activePiece: null,
 	points: null,
 	countP: null,
 			//// I, J, L, O, S, T, Z
@@ -42,19 +43,31 @@ var game = {
 	},
 	show: function() {
 		var out = "";
-		for (var i=0 ; i < this.board.length ; i++) {
-			for (var j=0 ; j < this.board[i].length ; j++) {
-				//if (0 <= activePiece.pos[0]-activePiece.form.legth) 
-				//if (i<activePiece.form.length &&
-						//j<activePiece.form[0].length) {
-					if (activePiece.form[i+activePiece.form.length][j]==1) {
-					//if (activePiece.pos[0]==i && activePiece.pos[1]==j) {
-						out+="<span class=\""+ activePiece.name +"\">&#9724</span>";
-//					} else {
-//						out+="<span class=\""+ this.board[i][j] +"\">&#9724</span>";
-//					}
+		var copiaBoard = this.board;
+//		for (var i=0 ; i < this.activePiece.form.length ; i++) {
+//			for (var j=0 ; j < this.activePiece.form[i].length ; j++) {
+//				if (this.activePiece.form[i][j]==1) {
+//					var y = this.activePiece.pos[0]-i;
+//					var x = this.activePiece.pos[1]+j;
+//					copiaBoard[y][x] = this.activePiece.name;
+//				}
+//			}
+//		}
+		
+		for (var i=0 ; i < copiaBoard.length ; i++) {
+			for (var j=0 ; j < copiaBoard[i].length ; j++) {
+				var y = -i+this.activePiece.pos[0];
+				var x = +j-this.activePiece.pos[1];
+				
+				if (0 <= y && y < this.activePiece.form.length && 
+						0 <= x && x < this.activePiece.form[y].length ) {
+					if (this.activePiece.form[y][x]===1) {
+						out+="<span class=\""+ this.activePiece.name +"\">&#9724</span>";
+					} else {
+						out+="<span class=\""+ copiaBoard[i][j] +"\">&#9724</span>";
+					}
 				} else {
-					out+="<span class=\""+ this.board[i][j] +"\">&#9724</span>";
+					out+="<span class=\""+ copiaBoard[i][j] +"\">&#9724</span>";
 				}
 			}
 			out+="<br>";
@@ -130,11 +143,11 @@ var piece = function(name, form, posX, posY)
 		
 		this.move = function(x) {
 			if (x==-1 || x==1) {
-				this.pos[0] = parseInt(this.pos[0])+x;
+				this.pos[1] = parseInt(this.pos[1])+x;
 			}
 		};
 		this.godown = function() {
-			this.pos[1] = parseInt(this.pos[1])+1;
+			this.pos[0] = parseInt(this.pos[0])+1;
 		};
 		this.turn = function() {
 			//var tempForma = new Array(this.forma[0].length);
@@ -187,17 +200,17 @@ var piece = function(name, form, posX, posY)
 			return parseInt(Math.random() * 7);
 		};*/
 };
-var activePiece = null;
+game.activePiece = null;
 function initGame() {
 	game.init();
-	activePiece = game.newRandomPiece();
-	game.countP[activePiece.name] += 1;
+	game.activePiece = game.newRandomPiece();
+	game.countP[game.activePiece.name] += 1;
 }
 
 
 function PlayGame() {
 	initGame();
-	game.show();
+	log();
 }
 function RestartGame() {
 	initGame();
@@ -205,26 +218,27 @@ function RestartGame() {
 	log();
 }
 function log() {
+	game.show();
 	game.log();
-	activePiece.printLog();
+	game.activePiece.printLog();
 }
 function myFunctionGirarP() {
-	activePiece.turn();
+	game.activePiece.turn();
 	log();
 }
 function myFunctionBajarP() {
-	activePiece.godown();
+	game.activePiece.godown();
 	log();
 }
 function myFunctionMoverIP() {
-	activePiece.move(-1);
+	game.activePiece.move(-1);
 	log();
 }
 function myFunctionMoverDP() {
-	activePiece.move(1);
+	game.activePiece.move(1);
 	log();
 }
 function myFunctionNewPieceP() {
-	activePiece = activePiece.newPiece();
+	game.activePiece = game.activePiece.newPiece();
 	log();
 }
