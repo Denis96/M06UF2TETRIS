@@ -1,13 +1,14 @@
-//	0 1 2 3 4 5 6 7
+//	0 1 2 3 4 5 6 7    12
 //
 //	0  1 O O O O O O 1	I = 4
 //	1  1 O · O O · O 1	J = 2
 //	2  1 O # # O O O 1
-//	3  X O O # # O O 1	pos[0] = 4 -> 3
+//	3  * O O # # O O 1	pos[0] = 4 -> 3
 //	4  1 O X O O · O 1	pos[1] = 2 -> 0
 //	5  1 O O O O O O 1
 //	6  1 O O O O O O 1	fomra 4 x 4
 //	7  1 O O O O O O 1
+// 22
 
 var game = { 
 	board: null,	//	IMPORTANTE! ARRAY CON LETRAS E(MPTY), W(ALL) Y LAS OTRAS PARA LAS PEIZAS
@@ -59,9 +60,10 @@ var game = {
 				var y = -i+this.activePiece.pos[0];
 				var x = +j-this.activePiece.pos[1];
 				
-				if (0 <= y && y < this.activePiece.form.length && 
-						0 <= x && x < this.activePiece.form[y].length ) {
-					if (this.activePiece.form[y][x]===1) {
+				if ( ( 0 <= y && y < this.activePiece.form.length ) && 
+						( 0 <= x && x < this.activePiece.form[y].length ) ) {
+					var n = [3,2,1,0]; // 
+					if (this.activePiece.form[n[y]][x]===1) {
 						out+="<span class=\""+ this.activePiece.name +"\">&#9724</span>";
 					} else {
 						out+="<span class=\""+ copiaBoard[i][j] +"\">&#9724</span>";
@@ -73,6 +75,12 @@ var game = {
 			out+="<br>";
 		}
 		document.getElementById("game").innerHTML = out;
+	},
+	newPiece: function() {
+			var tempPiece = this.nextPiece;
+			this.nextPiece = this.newRandomPiece();
+			this.countP[tempPiece.name] += 1;
+			return tempPiece;
 	},
 	newRandomPiece: function() {
 		var i = parseInt(Math.random() * 7);
@@ -111,12 +119,51 @@ var game = {
 		}
 		return new piece(name, forma, 3, 4);
 	},
-	move: function() {
-		
+	collision: function() {
+		var shock = false;
+		for (var i=0 ; ( i < this.activePiece.form.length ) && shock===false ; i++) {
+			for (var j=0 ; j < this.activePiece.form[i].length ; j++) {
+				if (this.activePiece.form[i][j]===1) {
+					var y = this.activePiece.pos[0]-i;
+					var x = this.activePiece.pos[1]+j;
+					if (game.board[y][x]!=="e") {
+						shock=true;
+					}
+				}
+			}
+		}
+		return shock;
+	},
+	print: function() {
+		for (var i=0 ; i < this.activePiece.form.length  ; i++) {
+			for (var j=0 ; j < this.activePiece.form[i].length ; j++) {
+				if (this.activePiece.form[i][j]===1) {
+					var n = [3,2,1,0]; // 
+					
+					var y = this.activePiece.pos[0]-n[i];
+					var x = this.activePiece.pos[1]+j;
+					game.board[y][x]=game.activePiece.name;
+				}
+			}
+		}
+	},
+	move: function() { // game
+		game.activePiece.godownup(+1);
+		if (game.collision()) {
+			game.activePiece.godownup(-1);
+			game.print();
+			game.activePiece=game.newPiece();
+		}
+		game.show();
+		game.log();
 	},
 	playGame: function() {
-		endGame(); // Evita que pueda haber multibles setIntervals activos
-		play = setInterval(this.move, 250);
+		this.endGame(); // Evita que pueda haber multibles setIntervals activos
+		play = setInterval(this.move, 100);
+	},
+	playGameS: function() {
+		this.endGame(); // Evita que pueda haber multibles setIntervals activos
+		play = setInterval(this.move, 750);
 	},
 	endGame: function() {
 		clearInterval(play);
@@ -146,8 +193,8 @@ var piece = function(name, form, posX, posY)
 				this.pos[1] = parseInt(this.pos[1])+x;
 			}
 		};
-		this.godown = function() {
-			this.pos[0] = parseInt(this.pos[0])+1;
+		this.godownup = function(x) {
+			this.pos[0] = parseInt(this.pos[0])+x;
 		};
 		this.turn = function() {
 			//var tempForma = new Array(this.forma[0].length);
@@ -165,12 +212,6 @@ var piece = function(name, form, posX, posY)
 				}
 			}
 			this.form=tempForm;
-		};
-		this.newPiece = function() {
-			var tempPiece = game.nextPiece;
-			game.nextPiece = game.newRandomPiece();
-			game.countP[tempPiece.name] += 1;
-			return tempPiece;
 		};
 		this.log = function() {
 			var out="";
@@ -200,6 +241,7 @@ var piece = function(name, form, posX, posY)
 			return parseInt(Math.random() * 7);
 		};*/
 };
+play = null;
 game.activePiece = null;
 function initGame() {
 	game.init();
@@ -208,14 +250,15 @@ function initGame() {
 }
 
 
-function PlayGame() {
+function ShowGame() {
 	initGame();
 	log();
 }
+function PlayGame() {
+	game.playGame();
+}
 function RestartGame() {
-	initGame();
-	game.show();
-	log();
+	game.playGameS();
 }
 function log() {
 	game.show();
@@ -226,8 +269,12 @@ function myFunctionGirarP() {
 	game.activePiece.turn();
 	log();
 }
+function myFunctionSubirP() {
+	game.activePiece.godownup(-1);
+	log();
+}
 function myFunctionBajarP() {
-	game.activePiece.godown();
+	game.activePiece.godownup(+1);
 	log();
 }
 function myFunctionMoverIP() {
@@ -239,6 +286,6 @@ function myFunctionMoverDP() {
 	log();
 }
 function myFunctionNewPieceP() {
-	game.activePiece = game.activePiece.newPiece();
+	game.activePiece = game.newPiece();
 	log();
 }
