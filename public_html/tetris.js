@@ -6,12 +6,12 @@
 //	3  * O O # # O O 1	pos[0] = 4 -> 3
 //	4  1 O X O O · O 1	pos[1] = 2 -> 0
 //	5  1 O O O O O O 1
-//	6  1 O O O O O O 1	fomra 4 x 4
+//	6  1 O O O O O O 1	forma 4 x 4
 //	7  1 O O O O O O 1
 // 22
 
 var game = { 
-	board: null,	//	IMPORTANTE! ARRAY CON LETRAS E(MPTY), W(ALL) Y LAS OTRAS PARA LAS PEIZAS
+	board: null, //	IMPORTANTE! ARRAY CON LETRAS: E(MPTY), W(ALL) Y LAS OTRAS PARA LAS PIEZAS
 	lengthB: [22, 12],
 	nextPiece: null,
 	activePiece: null,
@@ -45,6 +45,7 @@ var game = {
 	show: function() {
 		var out = "";
 		var copiaBoard = this.board;
+		
 //		for (var i=0 ; i < this.activePiece.form.length ; i++) {
 //			for (var j=0 ; j < this.activePiece.form[i].length ; j++) {
 //				if (this.activePiece.form[i][j]==1) {
@@ -75,6 +76,34 @@ var game = {
 			out+="<br>";
 		}
 		document.getElementById("game").innerHTML = out;
+	},
+	clearLines: function() {
+		var endClear = false;
+		for (var i = this.board.length-2  ; ( i >= 0 ) && !endClear ; i--) {
+			if ( this.board[i] === ["w", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "w"] ) {
+				endClear=true;
+			} else {
+				
+				var empty=false;
+				
+				for (var j = 0 ; (j < this.board[i].length) && !empty ; j++) {
+					if ( this.board[i][j] === "e" ) {
+						var empty=true;
+					}
+				}
+				
+				if (!empty) {
+					this.clearLine(i);
+					i++;
+				}
+			}
+		}
+	},
+	clearLine: function(i) {
+		for ( i ; i > 0 ; i--) {
+			this.board[i]=this.board[i-1];
+		}
+		this.board[0] === ["w", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "w"];
 	},
 	newPiece: function() {
 			var tempPiece = this.nextPiece;
@@ -119,12 +148,31 @@ var game = {
 		}
 		return new piece(name, forma, 3, 4);
 	},
+	movePiece: function(x, y) {
+		game.activePiece.move(x, y);
+		if (game.collision()) {
+			game.activePiece.move(-x, -y);
+			if (y > 0) { // si la colisión se hizo cunado la pieza bajaba
+				game.stamp();
+				game.activePiece=game.newPiece();
+			}
+		}
+	},
+	turnPiece: function() {
+		game.activePiece.turn();
+		if (game.collision()) {
+			game.activePiece.turn();
+			game.activePiece.turn();
+			game.activePiece.turn();
+		}
+	},
 	collision: function() {
 		var shock = false;
 		for (var i=0 ; ( i < this.activePiece.form.length ) && shock===false ; i++) {
 			for (var j=0 ; j < this.activePiece.form[i].length ; j++) {
 				if (this.activePiece.form[i][j]===1) {
-					var y = this.activePiece.pos[0]-i;
+					var n = [3,2,1,0]; // 
+					var y = this.activePiece.pos[0]-n[i];
 					var x = this.activePiece.pos[1]+j;
 					if (game.board[y][x]!=="e") {
 						shock=true;
@@ -134,7 +182,7 @@ var game = {
 		}
 		return shock;
 	},
-	print: function() {
+	stamp: function() {
 		for (var i=0 ; i < this.activePiece.form.length  ; i++) {
 			for (var j=0 ; j < this.activePiece.form[i].length ; j++) {
 				if (this.activePiece.form[i][j]===1) {
@@ -147,23 +195,20 @@ var game = {
 			}
 		}
 	},
-	move: function() { // game
-		game.activePiece.godownup(+1);
-		if (game.collision()) {
-			game.activePiece.godownup(-1);
-			game.print();
-			game.activePiece=game.newPiece();
-		}
+	motion: function() { // game
+		document.onkeydown = keyPressed;
+		game.movePiece(0, +1);
+		game.clearLines();
 		game.show();
 		game.log();
 	},
 	playGame: function() {
 		this.endGame(); // Evita que pueda haber multibles setIntervals activos
-		play = setInterval(this.move, 100);
+		play = setInterval(this.motion, 200);
 	},
 	playGameS: function() {
 		this.endGame(); // Evita que pueda haber multibles setIntervals activos
-		play = setInterval(this.move, 750);
+		play = setInterval(this.motion, 750);
 	},
 	endGame: function() {
 		clearInterval(play);
@@ -181,23 +226,18 @@ var game = {
 		
 		document.getElementById("logGame").innerHTML = out;
 	}
-}; 
+};
 
 var piece = function(name, form, posX, posY)
 	{	this.name = name;
 		this.form = form;
 		this.pos = [posX, posY];
 		
-		this.move = function(x) {
-			if (x==-1 || x==1) {
+		this.move = function(x, y) { //solo pueden ser -1 o 
 				this.pos[1] = parseInt(this.pos[1])+x;
-			}
-		};
-		this.godownup = function(x) {
-			this.pos[0] = parseInt(this.pos[0])+x;
+				this.pos[0] = parseInt(this.pos[0])+y;
 		};
 		this.turn = function() {
-			//var tempForma = new Array(this.forma[0].length);
 			var tempForm = [
 					[0, 0, 0, 0],
 					[0, 0, 0, 0],
@@ -206,7 +246,6 @@ var piece = function(name, form, posX, posY)
 				];
 			
 			for (var i=0; i < this.form.length ; i++) {
-				//tempForma[i] = new Array(this.forma.length);
 				for (var j = 0; j < this.form[i].length ; j++) {
 					tempForm[j][ this.form[i].length-i-1 ] = this.form[i][j];
 				}
@@ -237,10 +276,44 @@ var piece = function(name, form, posX, posY)
 			var out = this.log();
 			document.getElementById("logPiece").innerHTML = out;
 		};
-		/*this.randomP = function() { 
-			return parseInt(Math.random() * 7);
-		};*/
 };
+
+var gameController = {
+	up: function() {
+		game.turnPiece();
+		game.show();
+		game.log();
+	},
+	down: function() {
+		game.movePiece(0, 1);
+		game.show();
+		game.log();
+	},
+	right: function() {
+		game.movePiece(1, 0);
+		game.show();
+		game.log();
+	},
+	left: function() {
+		game.movePiece(-1, 0);
+		game.show();
+		game.log();
+	}
+};
+
+function keyPressed(e) {
+	if (e.key == "ArrowUp") {
+		gameController.up();	// arriba
+	} else if (e.key == "ArrowRight") {
+		gameController.right();	// derecha
+	} else if (e.key == "ArrowDown") {
+		gameController.down();	// izquierda
+	} else if (e.key == "ArrowLeft") {
+		gameController.left();	// abajo
+	}
+}
+
+
 play = null;
 game.activePiece = null;
 function initGame() {
@@ -263,26 +336,26 @@ function RestartGame() {
 function log() {
 	game.show();
 	game.log();
-	game.activePiece.printLog();
+//	game.activePiece.printLog();
 }
 function myFunctionGirarP() {
-	game.activePiece.turn();
+	game.turnPiece();
 	log();
 }
 function myFunctionSubirP() {
-	game.activePiece.godownup(-1);
+	game.movePiece(0, -1);
 	log();
 }
 function myFunctionBajarP() {
-	game.activePiece.godownup(+1);
+	game.movePiece(0, 1);
 	log();
 }
 function myFunctionMoverIP() {
-	game.activePiece.move(-1);
+	game.movePiece(-1, 0);
 	log();
 }
 function myFunctionMoverDP() {
-	game.activePiece.move(1);
+	game.movePiece(1, 0);
 	log();
 }
 function myFunctionNewPieceP() {
