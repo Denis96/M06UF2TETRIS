@@ -17,6 +17,7 @@ var game = {
 	activePiece: null,
 	points: null,
 	countP: null,
+	speed: null,
 			//// I, J, L, O, S, T, Z
 	init: function() {
 		this.board = new Array (this.lengthB[0]);
@@ -32,6 +33,7 @@ var game = {
 			this.board[this.lengthB[0]-1][j]="w";
 		}
 		this.points = 0;
+		this.speed=700;
 		this.countP = new Array ();
 			this.countP["i"] = 0;
 			this.countP["j"] = 0;
@@ -73,6 +75,7 @@ var game = {
 					out+="<span class=\""+ copiaBoard[i][j] +"\">&#9724</span>";
 				}
 			}
+//			out+= " "+i;
 			out+="<br>";
 		}
 		document.getElementById("game").innerHTML = out;
@@ -102,6 +105,10 @@ var game = {
 	clearLine: function(i) {
 		for ( i ; i > 0 ; i--) {
 			this.board[i]=this.board[i-1];
+		}
+		this.points+=10;
+		if (this.speed>50 && this.points%100===0) {
+			this.levelUp();
 		}
 		this.board[0] === ["w", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "w"];
 	},
@@ -204,20 +211,23 @@ var game = {
 	},
 	playGame: function() {
 		this.endGame(); // Evita que pueda haber multibles setIntervals activos
-		play = setInterval(this.motion, 200);
-	},
-	playGameS: function() {
-		this.endGame(); // Evita que pueda haber multibles setIntervals activos
-		play = setInterval(this.motion, 750);
+		play = setInterval(this.motion, this.speed);
 	},
 	endGame: function() {
 		clearInterval(play);
 	},
+	levelUp: function() {
+		this.endGame();
+		this.speed-=50;
+		this.playGame();
+	},
+	
 	log: function() {
 		var out = "";
-		out+="<br>Poins: "+this.points;
+		out+="<br>Poins: " + this.points;
+		out+="<br>Speed: " + this.speed;
 		
-		out+="<br><br>";
+		out+="<br><br>Next piece:";
 		out+=this.nextPiece.log();	
 		
 		for (var key in this.countP) {
@@ -267,8 +277,8 @@ var piece = function(name, form, posX, posY)
 					}
 				}
 			}
-			out = out+"<br>PosisciónX: "+this.pos[0];
-			out = out+"<br>PosisciónY: "+this.pos[1];
+//			out = out+"<br>PosisciónX: "+this.pos[0];
+//			out = out+"<br>PosisciónY: "+this.pos[1];
 			
 			return out;
 		};
